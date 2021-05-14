@@ -10,7 +10,16 @@
 #include <main.h>
 #include <motors.h>
 #include <camera/po8030.h>
+<<<<<<< HEAD
 #include <chprintf.h>
+=======
+#include <sensors/proximity.h>
+#include <audio/play_melody.h>
+#include <chprintf.h>
+#include <spi_comm.h>
+#include <audio/audio_thread.h>
+#include <msgbus/messagebus.h>
+>>>>>>> detect_obstacle
 
 #include <pi_regulator.h>
 #include <process_image.h>
@@ -40,6 +49,7 @@ int main(void)
     halInit();
     chSysInit();
     mpu_init();
+    //chprintf((BaseSequentialStream *)&SDU1, "TEST = %d \n", 350);
 
     //starts the serial communication
     serial_start();
@@ -50,10 +60,24 @@ int main(void)
 	po8030_start();
 	//inits the motors
 	motors_init();
+<<<<<<< HEAD
 
 	//stars the threads for the pi regulator and the processing of the image
 	pi_regulator_start();
+//	process_image_start();
+=======
+	//starts the proximity sensors
+	proximity_start();
+	//starts the microphones for melody
+	dac_start();
+	playMelodyStart();
+
+
+	//stars the threads for the pi regulator, the processing of the image & the obstacle detection
+	detect_obstacle_start();
+	pi_regulator_start();
 	process_image_start();
+>>>>>>> detect_obstacle
 
     /* Infinite loop. */
     while (1) {
