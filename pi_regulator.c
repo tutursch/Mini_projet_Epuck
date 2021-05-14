@@ -10,6 +10,10 @@
 #include <pi_regulator.h>
 #include <process_image.h>
 
+#define NSTEP_ONE_TURN 1000 //[step pour un tour]
+#define WHEEL_PERIMETER 13 //[cm]
+#define CRUISING_SPEED 5 * NSTEP_ONE_TURN / WHEEL_PERIMETER // vitesse de 5 cm/s
+
 //simple PI regulator implementation
 int16_t pi_regulator(float distance, float goal){
 
@@ -55,9 +59,21 @@ static THD_FUNCTION(PiRegulator, arg) {
     while(1){
         time = chVTGetSystemTime();
         
-        //computes the speed to give to the motors
-        //distance_cm is modified by the image processing thread
-        speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
+        //define the speed given according to the different situations
+
+        switch(get_status()){
+        	case 0 :
+        		speed = 0 ;
+        		break;
+
+        	case 1 :
+        		speed = CRUISING_SPEED;
+        		break;
+
+        	case 2 :
+        		speed = CRUISING_SPEED / 2;
+        		break;
+        }
         //computes a correction factor to let the robot rotate to be in front of the line
         speed_correction = (get_line_position() - (IMAGE_BUFFER_SIZE/2));
 

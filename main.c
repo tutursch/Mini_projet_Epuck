@@ -40,6 +40,7 @@ int main(void)
     halInit();
     chSysInit();
     mpu_init();
+    //chprintf((BaseSequentialStream *)&SDU1, "TEST = %d \n", 350);
 
     //starts the serial communication
     serial_start();
