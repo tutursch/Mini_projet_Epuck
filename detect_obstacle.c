@@ -29,13 +29,13 @@ void show_obstacle(proximity_msg_t *prox_values){
 	 }
 
 	if (prox_values->ambient[7] - prox_values->reflected[7] > threshold){
-	    led_val[7] = 1;
+	    led_val[1] = 1;
 	 }else{
-	    led_val[7]=0;
+	    led_val[1]=0;
 	 }
 
 	 //arrêter les moteurs si IR1 ou IR8 détectent un obstacle
-	 if ((led_val[0] == 1) & (led_val[7]==1)){
+	 if ((led_val[0] == 1) & (led_val[1]==1)){
 		 presence_obstacle = 1;
 	 }else{
 		 presence_obstacle = 0;
