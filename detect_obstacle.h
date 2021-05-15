@@ -1,14 +1,8 @@
-/*
- * detect_obstacle.h
- *
- *  Created on: 26 avr. 2021
- *      Author: baudo
- */
 
 #ifndef DETECT_OBSTACLE_H_
 #define DETECT_OBSTACLE_H_
 
-#define NB_LEDS 8
+#define NB_LEDS 2
 
 #include <msgbus/messagebus.h>
 #include <sensors/proximity.h>

@@ -1,9 +1,3 @@
-/*
- * detect_obstacle.c
- *
- *  Created on: 26 avr. 2021
- *      Author: baudo
- */
 
 #include "ch.h"
 #include "hal.h"
@@ -22,33 +16,30 @@
 #include <msgbus/messagebus.h>
 
 static BSEMAPHORE_DECL(obstacle_detected_sem, TRUE);
-static uint8_t presence_obstacle = 0;
+static bool presence_obstacle = 0;
 static uint8_t threshold = 100;
 
 void show_obstacle(proximity_msg_t *prox_values){
 
 	uint8_t led_val[NB_LEDS] = {0};
-	uint8_t nb_obstacles = 0;
-	for (uint8_t i = 0; i < PROXIMITY_NB_CHANNELS ; i++){
-
-	    if (prox_values->ambient[i] - prox_values->reflected[i] > threshold){
-	    	led_val[i] = 1;
-	        nb_obstacles++;
-	    }else{
-	    	led_val[i]=0;
-	    }
+	if (prox_values->ambient[0] - prox_values->reflected[0] > threshold){
+	    led_val[0] = 1;
+	}else{
+		led_val[0]=0;
 	 }
 
-	 set_led (LED1, led_val[0]);
-	 set_rgb_led (LED8, led_val[7]*255,0,0);
+	if (prox_values->ambient[7] - prox_values->reflected[7] > threshold){
+	    led_val[7] = 1;
+	 }else{
+	    led_val[7]=0;
+	 }
 
 	 //arrêter les moteurs si IR1 ou IR8 détectent un obstacle
-	 if ((led_val[0] == 1) || (led_val[7]==1)){
-		presence_obstacle = 1;
+	 if ((led_val[0] == 1) & (led_val[7]==1)){
+		 presence_obstacle = 1;
 	 }else{
 		 presence_obstacle = 0;
 	 }
-
 }
 
 
@@ -71,8 +62,6 @@ static THD_FUNCTION(DetectObstacle, arg) {
     	time_det = chVTGetSystemTime();
 
     	messagebus_topic_wait(proximity_topic, &prox_values, sizeof(prox_values));
-    	//chprintf((BaseSequentialStream *)&SD3, "delta: %d ", prox_values.delta[0]);
-    	//chprintf((BaseSequentialStream *)&SD3, "init: %d ", prox_values.initValue[0]);
 
     	show_obstacle(&prox_values);
 
@@ -83,7 +72,6 @@ static THD_FUNCTION(DetectObstacle, arg) {
     	}else{
     		__asm__ volatile ("nop");
     	}
-
 
     	chThdSleepUntilWindowed(time_det, time_det + MS2ST(10));
 
@@ -100,24 +88,21 @@ static THD_FUNCTION(TreatObstacle, arg) {
     	chBSemWait(&obstacle_detected_sem);
 
     	if (presence_obstacle == 1){//on remet la condition, à cause de la priorité supérieure de cette thd.
-    		playMelody(RUSSIA,ML_SIMPLE_PLAY, NULL);
+    		//animation clignotant lorsqu'un piéton est détecté
+    		playNote(NOTE_D4,10);
     		set_led (LED7, 1);
     		set_led (LED3, 1);
       		chThdSleepMilliseconds(500);
+      		playNote(NOTE_A3,10);
  		   	set_led (LED7, 0);
  		   	set_led (LED3, 0);
     		chThdSleepMilliseconds(500);
 
 
-    	}else{
-    		stopCurrentMelody();
-    	  //  __asm__ volatile ("nop");
+    	}else{//éviter les cas non traités
+    	    __asm__ volatile ("nop");
     	}
-
    	}
-
-    //chThdSleepUntilWindowed(time_obst, time_obst + MS2ST(10));
-    	//chThdSleep(MS2ST(30));
 }
 
 

@@ -9,7 +9,6 @@
 #include <motors.h>
 #include <pi_regulator.h>
 #include <process_image.h>
-#include <detect_obstacle.h>
 
 #define NSTEP_ONE_TURN 1000 //[step pour un tour]
 #define WHEEL_PERIMETER 13 //[cm]
@@ -58,13 +57,10 @@ static THD_FUNCTION(PiRegulator, arg) {
     int16_t speed_correction = 0;
 
     while(1){
-
-    	//messagebus_topic_wait(detection_topic, &detection, sizeof(detection));
-
         time = chVTGetSystemTime();
         
-        //computes the speed to give to the motors
-        //distance_cm is modified by the image processing thread
+        //define the speed given according to the different situations
+
         switch(get_status()){
         	case 0 :
         		speed = 0 ;
@@ -87,8 +83,8 @@ static THD_FUNCTION(PiRegulator, arg) {
         }
 
         //applies the speed from the PI regulator and the correction for the rotation
-//		right_motor_set_speed(speed - ROTATION_COEFF * speed_correction);
-//		left_motor_set_speed(speed + ROTATION_COEFF * speed_correction);
+		right_motor_set_speed(speed - ROTATION_COEFF * speed_correction);
+		left_motor_set_speed(speed + ROTATION_COEFF * speed_correction);
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));

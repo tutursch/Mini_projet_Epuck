@@ -23,9 +23,7 @@ extern "C" {
 #define KP						800.0f
 #define KI 						3.5f	//must not be zero
 #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
-#define ERROR_COLOR_COEFF 		1.5f	//coefficient to compensate the error of precision of the camera
-#define MEAN_SECURITY 			3		//coefficient to be sure that we are well below the mean
-#define COLOR_MEAN_SECURITY 	1.2f	//compensate to be sure that the red is the main color
+#define ERROR_COEFF 			1.2f	//compensates the error of the camera
 
 /** Robot wide IPC bus. */
 extern messagebus_t bus;
